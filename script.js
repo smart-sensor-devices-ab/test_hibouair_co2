@@ -1,7 +1,7 @@
 import * as my_dongle from 'bleuio'
 import 'regenerator-runtime/runtime'
 
-
+let co2Arr =[]
 document.getElementById('connect').addEventListener('click', function(){
   my_dongle.at_connect()
 })
@@ -10,40 +10,53 @@ document.getElementById('central').addEventListener('click', function(){
     my_dongle.at_central().then((data)=>console.log(data))
   })
 //read txt file
-  document.getElementById('inputfile')
-  .addEventListener('change', function() {
-    
-    var fr=new FileReader();
+document.getElementById("myForm").addEventListener("submit", readFile);
+function readFile(e) {
+  e.preventDefault();
+  var fr=new FileReader();
     fr.onload=function(){
-        /* document.getElementById('output')
-                .textContent=fr.result; */
-                let da = fr.result.split("\r\n")
-                const deviceArr = da.filter(x => x != '')
+                let deviceArr = fr.result.split("\r\n")
+                //const deviceArr = da.filter(x => x != '')
                 console.log(deviceArr);
                 my_dongle.stop();
+                co2Arr=[]
     my_dongle.at_gapstatus().then((gs) => {
         if (gs[1].includes("Central")) {
             //checkData('054CC0')
+
             for (let x in deviceArr){
-                
                 setTimeout(() => {
                     checkData(deviceArr[x]);
-                    if((deviceArr.length-1)===Number(x)){
+                    if((deviceArr.length)===Number(x)+1){
+                      
                         document.getElementById("complete").innerHTML ='<hr/> Done. Min CO2 = '+Math.min(...co2Arr)+ ' Max CO2 = '+Math.max(...co2Arr)+' Average = '+co2Arr.reduce((a,b) => a + b, 0)/ co2Arr.length
+                        document.getElementById("resultData").innerHTML +='<hr/>'
                     }
                   }, 2000*x);
                 
             }    
         } else {
           my_dongle.at_central().then(() => {
-            checkData(deviceArr[0]);
+            for (let x in deviceArr){
+                
+              setTimeout(() => {
+                  checkData(deviceArr[x]);
+                  if((deviceArr.length)===Number(x)+1){
+                    
+                      document.getElementById("complete").innerHTML ='<hr/> Done. Min CO2 = '+Math.min(...co2Arr)+ ' Max CO2 = '+Math.max(...co2Arr)+' Average = '+co2Arr.reduce((a,b) => a + b, 0)/ co2Arr.length+'<hr/>'
+                      document.getElementById("resultData").innerHTML +='<hr/>'
+                  }
+                }, 2000*x);
+              
+          } 
           });
         }
       });
     }
         
-    fr.readAsText(this.files[0]);
-    })
+    fr.readAsText( document.getElementById("inputfile").files[0]);
+}
+  
 
 /* const deviceArr=[
 '05886B',
@@ -76,6 +89,7 @@ document.getElementById('central').addEventListener('click', function(){
 
 const checkData = (sensorID) => {
     //console.log(sensorID)
+    if(!sensorID) return false
 
     my_dongle
       .at_findscandata(sensorID, 4)
@@ -109,7 +123,7 @@ const checkData = (sensorID) => {
       my_dongle.stop();
     }, 1000); */
   };
-const co2Arr =[]
+
   const getData = async (scannedData) => {
 
         let ct = 0;

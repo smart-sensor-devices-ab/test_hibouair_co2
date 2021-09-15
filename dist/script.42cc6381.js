@@ -1425,6 +1425,19 @@ function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try
 
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
 
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
+
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter); }
+
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
+var co2Arr = [];
 document.getElementById('connect').addEventListener('click', function () {
   my_dongle.at_connect();
 });
@@ -1434,23 +1447,30 @@ document.getElementById('central').addEventListener('click', function () {
   });
 }); //read txt file
 
-document.getElementById('inputfile').addEventListener('change', function () {
+document.getElementById("myForm").addEventListener("submit", readFile);
+
+function readFile(e) {
+  e.preventDefault();
   var fr = new FileReader();
 
   fr.onload = function () {
-    /* document.getElementById('output')
-            .textContent=fr.result; */
-    var da = fr.result.split("\r\n");
-    var deviceArr = da.filter(function (x) {
-      return x != '';
-    });
+    var deviceArr = fr.result.split("\r\n"); //const deviceArr = da.filter(x => x != '')
+
     console.log(deviceArr);
     my_dongle.stop();
+    co2Arr = [];
     my_dongle.at_gapstatus().then(function (gs) {
       if (gs[1].includes("Central")) {
         var _loop = function _loop(x) {
           setTimeout(function () {
             checkData(deviceArr[x]);
+
+            if (deviceArr.length === Number(x) + 1) {
+              document.getElementById("complete").innerHTML = '<hr/> Done. Min CO2 = ' + Math.min.apply(Math, _toConsumableArray(co2Arr)) + ' Max CO2 = ' + Math.max.apply(Math, _toConsumableArray(co2Arr)) + ' Average = ' + co2Arr.reduce(function (a, b) {
+                return a + b;
+              }, 0) / co2Arr.length;
+              document.getElementById("resultData").innerHTML += '<hr/>';
+            }
           }, 2000 * x);
         };
 
@@ -1460,14 +1480,29 @@ document.getElementById('inputfile').addEventListener('change', function () {
         }
       } else {
         my_dongle.at_central().then(function () {
-          checkData(deviceArr[0]);
+          var _loop2 = function _loop2(_x) {
+            setTimeout(function () {
+              checkData(deviceArr[_x]);
+
+              if (deviceArr.length === Number(_x) + 1) {
+                document.getElementById("complete").innerHTML = '<hr/> Done. Min CO2 = ' + Math.min.apply(Math, _toConsumableArray(co2Arr)) + ' Max CO2 = ' + Math.max.apply(Math, _toConsumableArray(co2Arr)) + ' Average = ' + co2Arr.reduce(function (a, b) {
+                  return a + b;
+                }, 0) / co2Arr.length + '<hr/>';
+                document.getElementById("resultData").innerHTML += '<hr/>';
+              }
+            }, 2000 * _x);
+          };
+
+          for (var _x in deviceArr) {
+            _loop2(_x);
+          }
         });
       }
     });
   };
 
-  fr.readAsText(this.files[0]);
-});
+  fr.readAsText(document.getElementById("inputfile").files[0]);
+}
 /* const deviceArr=[
 '05886B',
 '0578EC',
@@ -1498,8 +1533,10 @@ document.getElementById('inputfile').addEventListener('change', function () {
       });
 }) */
 
+
 var checkData = function checkData(sensorID) {
   //console.log(sensorID)
+  if (!sensorID) return false;
   my_dongle.at_findscandata(sensorID, 4).then(function (data) {
     var scannedData = data[data.length - 1];
     scannedData = scannedData.split(" ");
@@ -1542,9 +1579,10 @@ var getData = /*#__PURE__*/function () {
             if (scannedData.pm25 >= 0) ct++;
             if (scannedData.pm10 >= 0) ct++; */
 
+            co2Arr.push(scannedData.co2);
             return _context.abrupt("return", ct);
 
-          case 8:
+          case 9:
           case "end":
             return _context.stop();
         }
@@ -1552,7 +1590,7 @@ var getData = /*#__PURE__*/function () {
     }, _callee);
   }));
 
-  return function getData(_x) {
+  return function getData(_x2) {
     return _ref.apply(this, arguments);
   };
 }();
@@ -1580,4 +1618,4 @@ var parseSensorData = function parseSensorData(input) {
   return sensorData;
 };
 },{"bleuio":"okjw","regenerator-runtime/runtime":"KA2S"}]},{},["mpVp"], null)
-//# sourceMappingURL=/script.2b167ad7.js.map
+//# sourceMappingURL=/script.42cc6381.js.map
