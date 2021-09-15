@@ -25,9 +25,14 @@ document.getElementById('central').addEventListener('click', function(){
         if (gs[1].includes("Central")) {
             //checkData('054CC0')
             for (let x in deviceArr){
+                
                 setTimeout(() => {
                     checkData(deviceArr[x]);
+                    if((deviceArr.length-1)===Number(x)){
+                        document.getElementById("complete").innerHTML ='<hr/> Done. Min CO2 = '+Math.min(...co2Arr)+ ' Max CO2 = '+Math.max(...co2Arr)+' Average = '+co2Arr.reduce((a,b) => a + b, 0)/ co2Arr.length
+                    }
                   }, 2000*x);
+                
             }    
         } else {
           my_dongle.at_central().then(() => {
@@ -104,7 +109,7 @@ const checkData = (sensorID) => {
       my_dongle.stop();
     }, 1000); */
   };
-
+const co2Arr =[]
   const getData = async (scannedData) => {
 
         let ct = 0;
@@ -117,6 +122,7 @@ const checkData = (sensorID) => {
         /* if (scannedData.pm1 >= 0) ct++;
         if (scannedData.pm25 >= 0) ct++;
         if (scannedData.pm10 >= 0) ct++; */
+        co2Arr.push(scannedData.co2)
         return ct;
   };
 
