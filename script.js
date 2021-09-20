@@ -3,7 +3,12 @@ import 'regenerator-runtime/runtime'
 
 let co2Arr =[]
 document.getElementById('connect').addEventListener('click', function(){
-  my_dongle.at_connect()
+  my_dongle.at_connect().then(()=>{
+    document.getElementById("connect").setAttribute("disabled", "disabled");
+    document.getElementById("isConnect").innerHTML += 'Connected.';
+  })
+  
+
 })
 
 document.getElementById('central').addEventListener('click', function(){
@@ -29,7 +34,7 @@ function readFile(e) {
                     checkData(deviceArr[x]);
                     if((deviceArr.length)===Number(x)+1){
                       
-                        document.getElementById("complete").innerHTML ='<hr/> Done. Min CO2 = '+Math.min(...co2Arr)+ ' Max CO2 = '+Math.max(...co2Arr)+' Average = '+co2Arr.reduce((a,b) => a + b, 0)/ co2Arr.length
+                        document.getElementById("complete").innerHTML ='<hr/> Done. Min CO2 = '+Math.min(...co2Arr)+ ' Max CO2 = '+Math.max(...co2Arr)+' Average = '+(co2Arr.reduce((a,b) => a + b, 0)/ co2Arr.length).toFixed(2)+' Difference= '+(Math.max(...co2Arr)-Math.min(...co2Arr))
                         document.getElementById("resultData").innerHTML +='<hr/>'
                     }
                   }, 2000*x);
@@ -43,7 +48,7 @@ function readFile(e) {
                   checkData(deviceArr[x]);
                   if((deviceArr.length)===Number(x)+1){
                     
-                      document.getElementById("complete").innerHTML ='<hr/> Done. Min CO2 = '+Math.min(...co2Arr)+ ' Max CO2 = '+Math.max(...co2Arr)+' Average = '+co2Arr.reduce((a,b) => a + b, 0)/ co2Arr.length+'<hr/>'
+                      document.getElementById("complete").innerHTML ='<hr/> Done. Min CO2 = '+Math.min(...co2Arr)+ ' Max CO2 = '+Math.max(...co2Arr)+' Average = '+(co2Arr.reduce((a,b) => a + b, 0)/ co2Arr.length).toFixed(2)+' Difference= '+(Math.max(...co2Arr)-Math.min(...co2Arr))
                       document.getElementById("resultData").innerHTML +='<hr/>'
                   }
                 }, 2000*x);
@@ -223,6 +228,7 @@ const checkData = (sensorID) => {
             input[counter + 36],
           16
         ) / 10,
+      ts:new Date().toJSON().substring(0,19).replace('T',' '),
     };
     return sensorData;
   };

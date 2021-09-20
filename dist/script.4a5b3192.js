@@ -1439,7 +1439,10 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
 
 var co2Arr = [];
 document.getElementById('connect').addEventListener('click', function () {
-  my_dongle.at_connect();
+  my_dongle.at_connect().then(function () {
+    document.getElementById("connect").setAttribute("disabled", "disabled");
+    document.getElementById("isConnect").innerHTML += 'Connected.';
+  });
 });
 document.getElementById('central').addEventListener('click', function () {
   my_dongle.at_central().then(function (data) {
@@ -1466,9 +1469,9 @@ function readFile(e) {
             checkData(deviceArr[x]);
 
             if (deviceArr.length === Number(x) + 1) {
-              document.getElementById("complete").innerHTML = '<hr/> Done. Min CO2 = ' + Math.min.apply(Math, _toConsumableArray(co2Arr)) + ' Max CO2 = ' + Math.max.apply(Math, _toConsumableArray(co2Arr)) + ' Average = ' + co2Arr.reduce(function (a, b) {
+              document.getElementById("complete").innerHTML = '<hr/> Done. Min CO2 = ' + Math.min.apply(Math, _toConsumableArray(co2Arr)) + ' Max CO2 = ' + Math.max.apply(Math, _toConsumableArray(co2Arr)) + ' Average = ' + (co2Arr.reduce(function (a, b) {
                 return a + b;
-              }, 0) / co2Arr.length;
+              }, 0) / co2Arr.length).toFixed(2) + ' Difference= ' + (Math.max.apply(Math, _toConsumableArray(co2Arr)) - Math.min.apply(Math, _toConsumableArray(co2Arr)));
               document.getElementById("resultData").innerHTML += '<hr/>';
             }
           }, 2000 * x);
@@ -1485,9 +1488,9 @@ function readFile(e) {
               checkData(deviceArr[_x]);
 
               if (deviceArr.length === Number(_x) + 1) {
-                document.getElementById("complete").innerHTML = '<hr/> Done. Min CO2 = ' + Math.min.apply(Math, _toConsumableArray(co2Arr)) + ' Max CO2 = ' + Math.max.apply(Math, _toConsumableArray(co2Arr)) + ' Average = ' + co2Arr.reduce(function (a, b) {
+                document.getElementById("complete").innerHTML = '<hr/> Done. Min CO2 = ' + Math.min.apply(Math, _toConsumableArray(co2Arr)) + ' Max CO2 = ' + Math.max.apply(Math, _toConsumableArray(co2Arr)) + ' Average = ' + (co2Arr.reduce(function (a, b) {
                   return a + b;
-                }, 0) / co2Arr.length + '<hr/>';
+                }, 0) / co2Arr.length).toFixed(2) + ' Difference= ' + (Math.max.apply(Math, _toConsumableArray(co2Arr)) - Math.min.apply(Math, _toConsumableArray(co2Arr)));
                 document.getElementById("resultData").innerHTML += '<hr/>';
               }
             }, 2000 * _x);
@@ -1613,9 +1616,10 @@ var parseSensorData = function parseSensorData(input) {
     co2: parseInt(input[counter + 39] + input[counter + 40] + input[counter + 41] + input[counter + 42], 16),
     pm1: parseInt(input[counter + 29] + input[counter + 30] + input[counter + 27] + input[counter + 28], 16) / 10,
     pm25: parseInt(input[counter + 33] + input[counter + 34] + input[counter + 31] + input[counter + 32], 16) / 10,
-    pm10: parseInt(input[counter + 37] + input[counter + 38] + input[counter + 35] + input[counter + 36], 16) / 10
+    pm10: parseInt(input[counter + 37] + input[counter + 38] + input[counter + 35] + input[counter + 36], 16) / 10,
+    ts: new Date().toJSON().substring(0, 19).replace('T', ' ')
   };
   return sensorData;
 };
 },{"bleuio":"okjw","regenerator-runtime/runtime":"KA2S"}]},{},["mpVp"], null)
-//# sourceMappingURL=/script.42cc6381.js.map
+//# sourceMappingURL=/script.4a5b3192.js.map
