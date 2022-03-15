@@ -204,6 +204,11 @@ const checkData = (sensorID) => {
           input[counter + 42],
         16
       ),
+      vocType: parseInt(
+        input[counter + 43] +
+          input[counter + 44],
+        16
+      ),
       pm1:
         parseInt(
           input[counter + 29] +

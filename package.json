@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "bleuio": "^1.0.8",
+    "bleuio": "^1.0.9",
     "regenerator-runtime": "^0.13.9"
   },
   "devDependencies": {
